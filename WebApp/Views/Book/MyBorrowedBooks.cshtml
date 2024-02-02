@@ -1,0 +1,43 @@
+﻿@model List<Services.Model.Response.BookResponse>
+@{
+    //Layout = "_Layout";
+}
+
+<div class="mt-2" style="width:50%">
+
+    <div class="row">
+        <h2>Person</h2>
+        <div class="col-md-4">
+            <a href="/Person/AddPerson" class="btn btn-primary">Add Person</a>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>AuthorId</th>
+                    <th>Category</th>
+                    <th>Language</th>
+                    <th>Addition Date</th>
+                    <th>Book Name</th>
+                </tr>
+
+                @foreach (var book in Model)
+                {
+                    <tr>
+                        <td> @book.AuthorId </td>
+                        <td>@book.CategoryId</td>
+                        <td>@book.LanguageId</td>
+                        <td>@book.AdditionDate</td>
+                        <td>@book.BookName</td>
+                        <td>
+                            <a>Edit</a>
+                        </td>
+                    </tr>
+                }
+
+            </thead>
+        </table>
+
+    </div>
+
+</div>

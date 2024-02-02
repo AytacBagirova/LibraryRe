@@ -1,0 +1,41 @@
+﻿@model List<Services.Model.Response.UserResponse>
+@{
+    //Layout = "_Layout";
+}
+
+<div class="mt-2" style="width:50%">
+
+    <div class="row">
+        <h2>Person</h2>
+        <div class="col-md-4">
+            <a href="/Person/AddPerson" class="btn btn-primary">Add Person</a>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>FIRSTNAME</th>
+                    <th>LASTNAME</th>
+                    <th>EMAIL</th>
+                    <th>AGE</th>
+                </tr>
+
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td> @user.FirstName </td>
+                        <td>@user.LastName</td>
+                        <td>@user.Email</td>
+                        <td>@user.Age</td>
+                        <td>
+                            <a>Edit</a>
+                        </td>
+                    </tr>
+                }
+
+            </thead>
+        </table>
+
+    </div>
+
+</div>

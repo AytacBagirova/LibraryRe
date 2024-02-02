@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anasayfa</title>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 20%;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f1f1f1;
+        }
+
+        .search-box {
+            width: 60%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .search-results {
+            margin-top: 20px;
+        }
+
+        .dropdown {
+            margin-bottom: 10px;
+        }
+
+            .dropdown label {
+                display: block;
+            }
+
+            .dropdown select {
+                width: 100%;
+                padding: 8px;
+                box-sizing: border-box;
+            }
+
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+
+            .checkbox-group label {
+                display: block;
+            }
+
+        .filter-buttons {
+            margin-top: 10px;
+        }
+
+            .filter-buttons button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 8px;
+                cursor: pointer;
+            }
+
+                .filter-buttons button:hover {
+                    background-color: #45a049;
+                }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Filtreleme</h2>
+
+        <div class="dropdown">
+            <label for="category">Kategori Seçimi:</label>
+            <select id="category" name="category">
+                <option value="fiction">Kurgu</option>
+                <option value="history">Tarih</option>
+                <option value="science">Bilim</option>
+                <!-- Diğer kategorileri ekleyebilirsiniz -->
+            </select>
+        </div>
+
+        <div class="dropdown">
+            <label for="language">Dil Seçimi:</label>
+            <select id="language" name="language">
+                <option value="tr">Türkçe</option>
+                <option value="en">İngilizce</option>
+                <option value="ru">Rusça</option>
+                <!-- Diğer dilleri ekleyebilirsiniz -->
+            </select>
+        </div>
+
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="mostRead"> En Çok Okunan Kitaplar</label>
+            <label><input type="checkbox" id="newReleases"> Bu Ay Çıkanlar</label>
+        </div>
+
+        <div class="filter-buttons">
+            <button onclick="filterBooks()">Kitapları Filtrele</button>
+        </div>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Kitap Adı veya Yazar Adı">
+        <button onclick="searchBooks()">Kitap Ara</button>
+        <div class="search-results" id="searchResults">
+            <!-- Burada kitap listesi görüntülenebilir -->
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js CDN (Add this before the closing </body> tag) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        function searchBooks() {
+            var searchQuery = document.getElementById("searchInput").value.trim();
+            if (!searchQuery) {
+                alert("Lütfen bir arama terimi girin.");
+                return;
+            }
+
+            // API anahtarı
+            var apiKey = "AIzaSyCl3CvyzufqvpDKbjuI8T7F3bijc9MA7cw"; // Buraya kendi API anahtarınızı ekleyin
+
+            // Oluşturulan sorgu URL'si
+            var apiUrl = `https://www.googleapis.com/books/v1/volumes?q=${searchQuery}&key=${apiKey}`;
+
+            // API'yi çağır ve sonuçları göster
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => displaySearchResults(data.items))
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Arama sonuçlarını göster
+        function displaySearchResults(results) {
+            var searchResultsDiv = document.getElementById("searchResults");
+            searchResultsDiv.innerHTML = ""; // Önceki sonuçları temizle
+
+            if (!results) {
+                searchResultsDiv.innerHTML = "<p>Sonuç bulunamadı.</p>";
+                return;
+            }
+
+            results.forEach(function (item) {
+                var title = item.volumeInfo.title;
+                var authors = item.volumeInfo.authors ? item.volumeInfo.authors.join(', ') : 'Yazar bilgisi yok';
+                var thumbnail = item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.smallThumbnail : 'Resim yok';
+                var description = item.volumeInfo.description ? item.volumeInfo.description : 'Açıklama yok';
+
+                // Her kitap için bir konteyner (div) oluştur
+                var bookContainer = document.createElement("div");
+                bookContainer.style.border = "1px solid #ddd";
+                bookContainer.style.padding = "10px";
+                bookContainer.style.marginBottom = "10px";
+
+                // Kitap bilgilerini içeren HTML'i oluştur
+                var bookHTML = `
+                            <img src="${thumbnail}" alt="${title}" style="max-width: 100px;">
+                            <h3>${title}</h3>
+                            <p>Yazar: ${authors}</p>
+                            <p>${description}</p>
+                        `;
+
+                // Butonu oluştur
+                var addButton = document.createElement("button");
+                addButton.textContent = "Kitaplarıma Ekle";
+                addButton.addEventListener("click", function () {
+                    addBookToLibrary(item);
+                });
+
+                // Kitap bilgilerini ve butonu konteynere ekle
+                bookContainer.innerHTML = bookHTML;
+                bookContainer.appendChild(addButton);
+
+                // Konteyneri sonuçları gösteren div'e ekle
+                searchResultsDiv.appendChild(bookContainer);
+            });
+        }
+
+        function addBookToLibrary(book) {
+            var kitaplar = JSON.parse(localStorage.getItem("kitaplar")) || [];
+            kitaplar.push({
+                title: book.volumeInfo.title,
+                authors: book.volumeInfo.authors || [],
+                // Diğer kitap bilgilerini ekleyin
+            });
+
+            localStorage.setItem("kitaplar", JSON.stringify(kitaplar));
+            // Kitapları tekrar göstermek için kitaplarim.html sayfasını güncelle
+            document.getElementById("kutuphane").innerHTML = getKitaplarimHTML();
+        }
+
+        function filterBooks() {
+            // Filtreleme işlemlerini gerçekleştirin
+            // ...
+        }
+
+        function getKitaplarimHTML() {
+            // localStorage'den kitapları al ve HTML olarak formatla
+            var kitaplar = JSON.parse(localStorage.getItem("kitaplar")) || [];
+            var kitaplarHTML = "<h2>Kütüphanem</h2>";
+
+            kitaplar.forEach(function (kitap) {
+                kitaplarHTML += `
+                            <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
+                                <h3>${kitap.title}</h3>
+                                <p>Yazar: ${kitap.authors.join(', ')}</p>
+                                <!-- Diğer kitap bilgilerini ekleyin -->
+                            </div>
+                        `;
+            });
+
+            return kitaplarHTML;
+        }
+    </script>
+
+</body>
+</html>

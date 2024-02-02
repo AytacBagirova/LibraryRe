@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package library;
+
+option csharp_namespace = "LibraryAPI";
+
+message BookRequest {
+ 
+  string book_query = 1;
+}
+
+message BookResponse {
+
+  string title = 1;
+  string author = 2;
+
+}
+
+service Book {
+  // Google Books API'na kitap sorgusu yapar
+  rpc GetBookInfo (BookRequest) returns (BookResponse);
+}
